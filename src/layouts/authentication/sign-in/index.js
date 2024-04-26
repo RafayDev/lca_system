@@ -1,3 +1,4 @@
+import axios from "axios";
 /**
 =========================================================
 * Material Dashboard 2 React - v2.2.0
@@ -53,34 +54,28 @@ function Basic() {
 
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
-  async function login() {
+  const login = async () => {
     const data = { email, password };
-    const result = await fetch("http://localhost:5000/users/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (
-      result.status === 400 ||
-      result.status === 500 ||
-      result.status === 401 ||
-      result.status === 404
-    ) {
-      console.log("API Failed");
-    } else {
-      // setSuccessMessage('Login Successfull!');
-      // setShowSuccessAlert(true);
-      // result = await result.json()
-      // localStorage.setItem('user-info', JSON.stringify(result))
-      // sessionStorage.setItem('user-info', JSON.stringify(result))
-      console.log("API Success");
-      setTimeout(async () => {
-        await navigate("/dashboard");
-      }, 1000);
+    try {
+      const result = await axios.post("http://localhost:5000/users/login", data);
+      if (result.status === 200) {
+        console.log("API Success");
+        console.log("login data", result.data);
+        // setSuccessMessage('Login Successfull!');
+        // setShowSuccessAlert(true);
+        // localStorage.setItem('user-info', JSON.stringify(result.data));
+        // sessionStorage.setItem('user-info', JSON.stringify(result.data));
+        localStorage.setItem("authtoken", result?.data?.authToken);
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
+      } else {
+        console.log("API Failed");
+      }
+    } catch (error) {
+      console.error("API Failed", error);
     }
-  }
+  };
 
   return (
     <BasicLayout image={bgImage}>
